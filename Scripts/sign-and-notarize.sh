@@ -14,17 +14,18 @@ if [[ "$(xcode-select -p)" == *CommandLineTools* && -d /Applications/Xcode.app ]
 fi
 ZIP_NAME="Nameplate-${MARKETING_VERSION}.zip"
 
-# mac-release exports the 1Password field labels verbatim; accept both shapes.
-APP_STORE_CONNECT_API_KEY_P8="${APP_STORE_CONNECT_API_KEY_P8:-${private_key_p8:-}}"
-APP_STORE_CONNECT_KEY_ID="${APP_STORE_CONNECT_KEY_ID:-${key_id:-}}"
-APP_STORE_CONNECT_ISSUER_ID="${APP_STORE_CONNECT_ISSUER_ID:-${issuer_id:-}}"
+APP_STORE_CONNECT_API_KEY_P8="${APP_STORE_CONNECT_API_KEY_P8:-}"
+APP_STORE_CONNECT_KEY_ID="${APP_STORE_CONNECT_KEY_ID:-}"
+APP_STORE_CONNECT_ISSUER_ID="${APP_STORE_CONNECT_ISSUER_ID:-}"
 if [[ -z "$APP_STORE_CONNECT_API_KEY_P8" || -z "$APP_STORE_CONNECT_KEY_ID" || -z "$APP_STORE_CONNECT_ISSUER_ID" ]]; then
   echo "Missing App Store Connect credentials (private_key_p8 / key_id / issuer_id)." >&2
   exit 1
 fi
-KEY_FILE=$(mktemp /tmp/nameplate-api-key.XXXXXX.p8)
-NOTARIZE_ZIP=$(mktemp -u /tmp/NameplateNotarize.XXXXXX.zip)
-trap 'rm -f "$KEY_FILE" "$NOTARIZE_ZIP"' EXIT
+TEMP_DIR=$(mktemp -d "${TMPDIR:-/tmp}/nameplate-notary.XXXXXX")
+KEY_FILE="$TEMP_DIR/api-key.p8"
+NOTARIZE_ZIP="$TEMP_DIR/notarize.zip"
+trap 'rm -rf "$TEMP_DIR"' EXIT
+umask 077
 echo "$APP_STORE_CONNECT_API_KEY_P8" | sed 's/\\n/\n/g' > "$KEY_FILE"
 
 ./Scripts/package_app.sh release
@@ -52,8 +53,8 @@ cp "$ZIP_NAME" "Nameplate.zip"
 
 DMG_NAME="Nameplate-${MARKETING_VERSION}.dmg"
 echo "Building $DMG_NAME"
-DMG_STAGE=$(mktemp -d /tmp/nameplate-dmg.XXXXXX)
-trap 'rm -f "$KEY_FILE" "$NOTARIZE_ZIP"; rm -rf "$DMG_STAGE"' EXIT
+DMG_STAGE="$TEMP_DIR/dmg"
+mkdir "$DMG_STAGE"
 "$DITTO_BIN" "$APP_BUNDLE" "$DMG_STAGE/$APP_BUNDLE"
 rm -f "$DMG_NAME"
 create-dmg \

@@ -1,0 +1,24 @@
+{
+  "app": "Nameplate",
+  "repository": "steipete/Nameplate",
+  "bundle_id": "com.steipete.nameplate",
+  "minimum_macos": "15.0",
+  "architectures": [
+    "arm64"
+  ],
+  "sparkle_public_key": "PuuzNa/yoisEbFEZOkuwW1Su3Y/RD3Rph8cAk8+VZ4Y=",
+  "assets": [
+    "Nameplate-{version}.zip",
+    "Nameplate.zip",
+    "Nameplate-{version}.dmg",
+    "Nameplate.dmg",
+    "Nameplate-Windows-x64-{version}.zip",
+    "Nameplate-Windows-x64.zip",
+    "Nameplate-Windows-arm64-{version}.zip",
+    "Nameplate-Windows-arm64.zip",
+    "Nameplate-Linux-x86_64-{version}.tar.gz",
+    "Nameplate-Linux-x86_64.tar.gz",
+    "Nameplate-Linux-arm64-{version}.tar.gz",
+    "Nameplate-Linux-arm64.tar.gz"
+  ]
+}

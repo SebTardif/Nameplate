@@ -2,6 +2,8 @@
 
 ## 0.4.1 - Unreleased
 
+- Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
+
 - Maintenance: update eight compatible Rust dependencies, the xUnit Visual Studio runner to 4.0.1 (fixing test-thread limiting while retaining .NET 8 support), and the pinned artifact upload action to 7.0.2.
 
 - Maintenance: update Sparkle to 2.10.0, Microsoft.NET.Test.Sdk to 18.10.1, compatible Rust dependencies, and pinned CI setup/artifact actions while preserving the supported runtime floors.

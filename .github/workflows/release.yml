@@ -1,0 +1,284 @@
+name: Release
+run-name: Release ${{ inputs.tag || github.ref_name }} (dry_run=${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }})
+
+on:
+  push:
+    tags: ['v[0-9]*']
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: Build, sign, notarize, and verify without publishing
+        type: boolean
+        default: true
+      tag:
+        description: Existing signed annotated tag (required only when publishing)
+        type: string
+        default: ''
+
+permissions: {}
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  validate:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    outputs:
+      sha: ${{ steps.validate.outputs.sha }}
+      version: ${{ steps.validate.outputs.version }}
+      dry_run: ${{ steps.validate.outputs.dry_run }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ inputs.tag || github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require Homebrew handoff credentials for publication
+        if: github.event_name == 'push' || !inputs.dry_run
+        env:
+          TAP_TOKEN_PRESENT: ${{ secrets.HOMEBREW_TAP_TOKEN != '' }}
+        run: test "$TAP_TOKEN_PRESENT" = true
+      - name: Validate immutable source and exact-commit push CI
+        id: validate
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+          RELEASE_TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" != refs/heads/main ]]; then
+            echo 'Dispatch must use the default main branch' >&2
+            exit 1
+          fi
+          python3 .github/scripts/release.py validate
+          mv release-notes.md RELEASE-NOTES.md
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: payload-notes
+          path: RELEASE-NOTES.md
+          if-no-files-found: error
+
+  availability:
+    needs: validate
+    if: needs.validate.outputs.dry_run == 'false'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write # GitHub requires push access to include draft releases.
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - name: Refuse existing releases, including drafts, before building
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: 'false'
+        run: python3 .github/scripts/release.py availability
+
+  macos:
+    needs: [validate, availability]
+    if: always() && needs.validate.result == 'success' && (needs.availability.result == 'success' || needs.validate.outputs.dry_run == 'true')
+    runs-on: macos-26
+    timeout-minutes: 60
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_26.0.app || sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
+      - name: Test
+        run: |
+          swift test
+          node Scripts/test_tag_placement.mjs
+      - name: Install packaging tools
+        run: brew install create-dmg
+      - name: Import personal Developer ID into an ephemeral keychain
+        env:
+          MACOS_SIGNING_P12: ${{ secrets.MACOS_SIGNING_P12 }}
+          MACOS_SIGNING_P12_PASSWORD: ${{ secrets.MACOS_SIGNING_P12_PASSWORD }}
+        run: .github/scripts/setup-signing.sh
+      - name: Build, sign, notarize, and staple
+        env:
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.ASC_PRIVATE_KEY_P8 }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.ASC_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.ASC_ISSUER_ID }}
+        run: Scripts/sign-and-notarize.sh
+      - name: Verify the packed app and sign the Sparkle feed
+        env:
+          SPARKLE_PRIVATE_KEY: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+        run: |
+          set -euo pipefail
+          source version.env
+          mkdir -p release-assets "$RUNNER_TEMP/extracted"
+          cp Nameplate-${MARKETING_VERSION}*.zip release-assets/
+          cp Nameplate.zip Nameplate*.dmg release-assets/
+          ditto -x -k "release-assets/Nameplate-${MARKETING_VERSION}.zip" "$RUNNER_TEMP/extracted"
+          python3 .github/scripts/verify-macos.py "$RUNNER_TEMP/extracted/Nameplate.app"
+          export APP_BUNDLE="$RUNNER_TEMP/extracted/Nameplate.app"
+          export SPARKLE_SIGN_UPDATE="$(find .build/artifacts -type f -name sign_update -print -quit)"
+          test -x "$SPARKLE_SIGN_UPDATE"
+          python3 .github/scripts/release.py appcast
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: payload-macos
+          path: release-assets/*
+          if-no-files-found: error
+      - name: Remove signing credentials
+        if: always()
+        run: |
+          security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true
+          rm -f "$RUNNER_TEMP/signing.p12"
+
+  windows:
+    needs: [validate, availability]
+    if: always() && needs.validate.result == 'success' && (needs.availability.result == 'success' || needs.validate.outputs.dry_run == 'true')
+    runs-on: windows-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        arch: [x64, arm64]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          dotnet-version: '8.0.x'
+      - name: Test core
+        run: dotnet test windows/Nameplate.Core.Tests/Nameplate.Core.Tests.csproj -c Release
+      - name: Publish self-contained app and check PE architecture
+        shell: pwsh
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          RELEASE_ARCH: ${{ matrix.arch }}
+        run: |
+          dotnet publish windows/Nameplate.App/Nameplate.App.csproj -c Release -r "win-$env:RELEASE_ARCH" --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o payload
+          if ($LASTEXITCODE -ne 0) { throw 'dotnet publish failed' }
+          $exe = [IO.File]::ReadAllBytes("$pwd/payload/nameplate.exe")
+          $offset = [BitConverter]::ToInt32($exe, 0x3c)
+          $machine = [BitConverter]::ToUInt16($exe, $offset + 4)
+          $expected = if ($env:RELEASE_ARCH -eq 'x64') { 0x8664 } else { 0xaa64 }
+          if ($machine -ne $expected) { throw 'Incorrect Windows architecture' }
+          New-Item -ItemType Directory -Path release-assets
+          $stable = "Nameplate-Windows-$env:RELEASE_ARCH.zip"
+          Compress-Archive -Path payload/* -DestinationPath "release-assets/$stable"
+          Copy-Item "release-assets/$stable" "release-assets/Nameplate-Windows-$env:RELEASE_ARCH-$env:RELEASE_VERSION.zip"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: payload-windows-${{ matrix.arch }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  linux:
+    needs: [validate, availability]
+    if: always() && needs.validate.result == 'success' && (needs.availability.result == 'success' || needs.validate.outputs.dry_run == 'true')
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - name: Install GTK and X11 headers
+        run: sudo apt-get update && sudo apt-get install -y libgtk-4-dev libx11-dev libxi-dev
+      - name: Select Rust
+        run: rustup toolchain install stable --profile minimal && rustup default stable
+      - name: Test and build
+        run: |
+          cargo test --locked --manifest-path linux/Cargo.toml --workspace
+          cargo build --locked --manifest-path linux/Cargo.toml --release
+      - name: Smoke and package native Linux binary
+        env:
+          RELEASE_VERSION: ${{ needs.validate.outputs.version }}
+          RELEASE_ARCH: ${{ matrix.arch }}
+        run: |
+          set -euo pipefail
+          linux/target/release/nameplate --help
+          file linux/target/release/nameplate
+          test "$(uname -m)" = "${RELEASE_ARCH/arm64/aarch64}"
+          mkdir release-assets
+          tar -czf "release-assets/Nameplate-Linux-$RELEASE_ARCH.tar.gz" -C linux/target/release nameplate
+          cp "release-assets/Nameplate-Linux-$RELEASE_ARCH.tar.gz" "release-assets/Nameplate-Linux-$RELEASE_ARCH-$RELEASE_VERSION.tar.gz"
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: payload-linux-${{ matrix.arch }}
+          path: release-assets/*
+          if-no-files-found: error
+
+  assemble:
+    needs: [validate, macos, windows, linux]
+    if: always() && needs.validate.result == 'success' && needs.macos.result == 'success' && needs.windows.result == 'success' && needs.linux.result == 'success'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: payload-*
+          merge-multiple: true
+          path: release-assets
+      - name: Enforce complete shipping inventory and checksum every asset
+        run: python3 .github/scripts/release.py inventory
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: verified-release-${{ needs.validate.outputs.sha }}
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    needs: [validate, assemble]
+    if: needs.validate.outputs.dry_run == 'false'
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ needs.validate.outputs.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: verified-release-${{ needs.validate.outputs.sha }}
+          path: release-assets
+      - name: Publish verified draft and the signed Sparkle feed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DRY_RUN: ${{ needs.validate.outputs.dry_run }}
+          RELEASE_SHA: ${{ needs.validate.outputs.sha }}
+        run: python3 .github/scripts/release.py publish
+      - name: Hand off Homebrew update
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: python3 .github/scripts/homebrew.py

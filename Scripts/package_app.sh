@@ -108,7 +108,7 @@ chmod -R u+w "$APP"
 xattr -cr "$APP"
 find "$APP" -name '._*' -delete
 
-codesign "${SIGN_FLAGS[@]}" --entitlements "$APP_ENTITLEMENTS" --sign "$CODESIGN_ID" "$APP/Contents/Helpers/nameplate" 2>/dev/null || true
+codesign "${SIGN_FLAGS[@]}" --entitlements "$APP_ENTITLEMENTS" --sign "$CODESIGN_ID" "$APP/Contents/Helpers/nameplate"
 codesign "${SIGN_FLAGS[@]}" --entitlements "$APP_ENTITLEMENTS" --sign "$CODESIGN_ID" "$APP"
 
 echo "Created $APP"
