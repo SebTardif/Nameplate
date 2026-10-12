@@ -32,6 +32,22 @@ def api(path, method=None, **fields):
     return json.loads(run(*args))
 
 
+def deployment_targets(load_commands):
+    """Read only the OS target field; LC_BUILD_VERSION also has tool versions."""
+    versions = []
+    for block in re.split(r'Load command \d+', load_commands):
+        if re.search(r'cmd LC_BUILD_VERSION\b', block):
+            field = 'minos'
+        elif re.search(r'cmd LC_VERSION_MIN_MACOSX\b', block):
+            field = 'version'
+        else:
+            continue
+        match = re.search(r'^\s*' + field + r'\s+(\d+\.\d+(?:\.\d+)?)$', block, re.M)
+        assert match, 'Missing deployment target in Mach-O load command'
+        versions.append(match[1])
+    return versions
+
+
 def metadata():
     text = (ROOT / 'version.env').read_text()
     values = dict(re.findall(r'^(MARKETING_VERSION|BUILD_NUMBER)=([0-9.]+)$', text, re.M))
