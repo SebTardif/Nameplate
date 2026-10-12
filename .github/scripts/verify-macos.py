@@ -43,7 +43,9 @@ subprocess.run(['codesign', '--verify', '--deep', '--strict', '-R', f'=anchor ap
 subprocess.run(['spctl', '--assess', '--type', 'execute', '--verbose=2', str(app)], check=True)
 subprocess.run(['xcrun', 'stapler', 'validate', str(app)], check=True)
 if config['app'] == 'Nameplate':
-    subprocess.run([str(app / 'Contents/Helpers/nameplate'), '--help'], check=True)
+    help_result = subprocess.run([str(app / 'Contents/Helpers/nameplate'), '--help'], text=True, capture_output=True)
+    # The existing CLI's usage() exits 2 for help as well as invalid arguments.
+    assert help_result.returncode == 2 and 'nameplate attention' in (help_result.stdout + help_result.stderr), 'CLI help smoke failed'
 with tempfile.TemporaryDirectory() as home:
     environment = dict(os.environ, HOME=home, CFFIXED_USER_HOME=home)
     for name in [
