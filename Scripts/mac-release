@@ -1,6 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Publishing is owned by .github/workflows/release.yml. Keep verification only.
+case "${1:-}" in
+  status|notes|changelog-html|verify-appcast|check-assets|sparkle-key-status) ;;
+  *) echo "Use the GitHub Release workflow; this wrapper only verifies releases." >&2; exit 2 ;;
+esac
+
 SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
 cd "$ROOT"
