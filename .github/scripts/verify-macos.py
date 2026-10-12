@@ -9,6 +9,7 @@ import subprocess
 import sys
 import tempfile
 import time
+from release import deployment_targets
 
 config = json.loads(Path('.github/release.json').read_text())
 app = Path(sys.argv[1]).resolve()
@@ -35,9 +36,7 @@ for path in app.rglob('*'):
     assert required <= architectures, f'{path}: missing architecture'
     for arch in required:
         load = subprocess.check_output(['otool', '-arch', arch, '-l', str(path)], text=True)
-        blocks = re.split(r'Load command \d+', load)
-        relevant = [b for b in blocks if re.search(r'cmd LC_(?:BUILD_VERSION|VERSION_MIN_MACOSX)\b', b)]
-        minima = [m for b in relevant for m in re.findall(r'^\s*(?:minos|version)\s+(\d+\.\d+(?:\.\d+)?)$', b, re.M)]
+        minima = deployment_targets(load)
         assert minima, f'{path}: no deployment target for {arch}'
         assert all(tuple(map(int, m.split('.')[:2])) <= limit for m in minima), f'{path}: deployment target exceeds {limit}: {minima}'
 subprocess.run(['codesign', '--verify', '--deep', '--strict', '-R', f'=anchor apple generic and certificate leaf[subject.OU] = "Y5PE65HELJ" and identifier "{config["bundle_id"]}"', str(app)], check=True)

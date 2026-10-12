@@ -24,6 +24,25 @@ class ReleasePolicyTests(unittest.TestCase):
         self.addCleanup(self.root_patch.stop)
         self.addCleanup(self.config_patch.stop)
 
+    def test_minos_does_not_include_linker_tool_version(self):
+        load = """Load command 10
+          cmd LC_BUILD_VERSION
+      cmdsize 32
+     platform 1
+        minos 14.0
+          sdk 26.0
+       ntools 1
+         tool 3
+      version 1221.4
+Load command 11
+          cmd LC_SOURCE_VERSION
+      version 9999.1
+"""
+        self.assertEqual(release.deployment_targets(load), ['14.0'])
+
+    def test_legacy_minimum_os_command(self):
+        self.assertEqual(release.deployment_targets('Load command 1\n cmd LC_VERSION_MIN_MACOSX\n version 10.13\n sdk 14.4\n'), ['10.13'])
+
     def test_metadata_and_exact_notes(self):
         self.assertEqual(release.metadata(), ('1.2.3', '12'))
         self.assertEqual(release.notes('1.2.3'), '- A real change.\n')
