@@ -2,6 +2,8 @@
 
 ## 0.4.1 - Unreleased
 
+- Maintenance: update four compatible Rust dependencies and Microsoft.NET.Test.Sdk to 18.11.0 while retaining Rust 1.92 and .NET 8 support.
+
 - Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
 
 - Maintenance: update eight compatible Rust dependencies, the xUnit Visual Studio runner to 4.0.1 (fixing test-thread limiting while retaining .NET 8 support), and the pinned artifact upload action to 7.0.2.
