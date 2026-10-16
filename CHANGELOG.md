@@ -1,18 +1,17 @@
 # Changelog
 
-## 0.4.1 - Unreleased
+## 0.5.1 - Unreleased
 
-- Maintenance: update four compatible Rust dependencies, Microsoft.NET.Test.Sdk to 18.11.0, and the pinned artifact download action to 8.0.2 while retaining Rust 1.92 and .NET 8 support.
+## 0.5.0 - 2026-10-16
 
-- Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
-
-- Maintenance: update eight compatible Rust dependencies, the xUnit Visual Studio runner to 4.0.1 (fixing test-thread limiting while retaining .NET 8 support), and the pinned artifact upload action to 7.0.2.
-
-- Maintenance: update Sparkle to 2.10.0, Microsoft.NET.Test.Sdk to 18.10.1, compatible Rust dependencies, and pinned CI setup/artifact actions while preserving the supported runtime floors.
+**Highlights:** Anchor name tags at the center of any screen edge on macOS, Windows, and Linux, with precise offsets and improved macOS overlay visibility.
 
 - Name tags can anchor to the center of any screen edge on macOS, Windows, Linux, and the website demo, with signed offsets on centered axes, display-bounded placement, and numeric offset entry/reset in macOS settings and the demo. Thanks @Czaruno!
-
 - Fixed (macOS): floating overlay panels retain their requested window level, keeping name tags and splashes above regular windows. Thanks @Czaruno!
+- Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
+- Maintenance: update four compatible Rust dependencies, Microsoft.NET.Test.Sdk to 18.11.0, and the pinned artifact download action to 8.0.2 while retaining Rust 1.92 and .NET 8 support.
+- Maintenance: update eight compatible Rust dependencies, the xUnit Visual Studio runner to 4.0.1 (fixing test-thread limiting while retaining .NET 8 support), and the pinned artifact upload action to 7.0.2.
+- Maintenance: update Sparkle to 2.10.0, Microsoft.NET.Test.Sdk to 18.10.1, compatible Rust dependencies, and pinned CI setup/artifact actions while preserving the supported runtime floors.
 
 ## 0.4.0 - 2026-09-13
 
