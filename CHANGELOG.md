@@ -2,7 +2,7 @@
 
 ## 0.4.1 - Unreleased
 
-- Maintenance: update four compatible Rust dependencies and Microsoft.NET.Test.Sdk to 18.11.0 while retaining Rust 1.92 and .NET 8 support.
+- Maintenance: update four compatible Rust dependencies, Microsoft.NET.Test.Sdk to 18.11.0, and the pinned artifact download action to 8.0.2 while retaining Rust 1.92 and .NET 8 support.
 
 - Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
 
