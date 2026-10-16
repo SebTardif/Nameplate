@@ -1,84 +1,102 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" xmlns:dc="http://purl.org/dc/elements/1.1/" version="2.0">
-    <channel>
-        <title>Nameplate</title>
-        <item>
-            <title>0.4.0</title>
-            <pubDate>Sun, 13 Sep 2026 23:17:20 -0700</pubDate>
-            <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
-            <sparkle:version>11</sparkle:version>
-            <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description><![CDATA[<h2>Nameplate 0.4.0</h2>
-<p><strong>Highlights:</strong> Move name tags inward from any corner with configurable horizontal and vertical offsets on macOS, Windows, and Linux.</p>
-<ul>
-<li>Name-tag horizontal and vertical offsets can now move the tag inward from its selected corner on macOS, Windows, and Linux. Thanks @Czaruno!</li>
-<li>Maintenance: update Sparkle, Linux dependencies, Windows test tooling, and GitHub Actions checkout.</li>
-</ul>
-<p><a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md">View full changelog</a></p>
-]]></description>
-            <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.4.0/Nameplate-0.4.0.zip" length="3124529" type="application/octet-stream" sparkle:edSignature="R3B0i6LCKhqsxJgivjp5V/LEV1EM0zUcqSGcUP6m0KMexV8OeetCIkbw4AmkhDN4savkR3bDgl0urSML50eOCw=="/>
-        </item>
-        <item>
-            <title>0.3.1</title>
-            <pubDate>Thu, 16 Jul 2026 04:04:47 +0100</pubDate>
-            <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
-            <sparkle:version>10</sparkle:version>
-            <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nameplate 0.3.1</h2>
-<ul>
-<li>Overlay visibility changes now fade smoothly on macOS, Windows, and Linux, with reduced-motion settings respected.</li>
-</ul>
-<p><a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md">View full changelog</a></p>
-]]></description>
-            <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.3.1/Nameplate-0.3.1.zip" length="3099192" type="application/octet-stream" sparkle:edSignature="Uyjuc4k0mYpH8ln1pUR6RLUiFuwpMTkJL3VwjkcaiaABvOH3twO6gvFzfcl//QZEQqDaulPqgB66aWCAxnu1Cg=="/>
-        </item>
-        <item>
-            <title>0.3.0</title>
-            <pubDate>Wed, 15 Jul 2026 13:50:47 +0100</pubDate>
-            <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
-            <sparkle:version>9</sparkle:version>
-            <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <description><![CDATA[<h2>Nameplate 0.3.0</h2>
-<ul>
-<li>macOS: attention alerts now dismiss on any mouse click without consuming it, so the intended control underneath still receives the click.</li>
-<li>Website: the connect-splash demo now mirrors the native frame trace, glow, identity plate, exit timing, and Reduce Motion behavior; its attention demo also preserves the clicked control.</li>
-<li>Windows/Linux: connect splashes now match the macOS frame trace, glow, identity-plate entrance, exit timing, and reduced-motion behavior; attention alerts dismiss on any mouse click without consuming it (X11 on Linux).</li>
-<li>macOS: connect splash now traces the identity-colored screen perimeter, springs the nameplate into focus, dissolves smoothly, respects Reduce Motion, and plays when Nameplate launches.</li>
-<li>Fixed (macOS): remote-only overlays now use dedicated-port and process signals for best-effort TeamViewer and AnyDesk session detection. Thanks @abhinavgautam01!</li>
-<li>Linux: install Nameplate with <code>brew install steipete/tap/nameplate</code> and keep it current with <code>brew upgrade</code>. Thanks @officiallymarky!</li>
-<li>Fixed (macOS): imported config links now preserve watermark opacity values through the full Settings range instead of silently clamping them to 30%. Thanks @abhinavgautam01!</li>
-<li>Fixed (macOS): <code>nameplate attention --color</code> now rejects invalid values and normalizes valid hex colors before handing requests to the app. Thanks @abhinavgautam01!</li>
-<li>Fixed (macOS): Settings window placement now persists across app restarts. Thanks @abhinavgautam01!</li>
-<li>Fixed (macOS): rapid attention requests now queue and display in order instead of overwriting each other, while legacy handoffs still migrate. Thanks @abhinavgautam01!</li>
-<li>Fixed (macOS): attention cards now stay visibly bounded and click-through until presentation succeeds, recover safely across display and Space changes, and can be cleared with <code>nameplate dismiss</code> without quitting the app.</li>
-<li>Fixed (macOS): Sparkle now stays disabled for Homebrew-managed installs even when the app lives directly in <code>/Applications</code>. Thanks @abhinavgautam01!</li>
-<li>macOS: <code>nameplate attention --wait</code> now blocks until the human clicks, app-driven dismissal, request expiry, or wait timeout, with scriptable exit codes and FIFO behavior for concurrent alerts. Thanks @mvanhorn!</li>
-<li>Optional name-tag info lines show the current IP address, uptime, macOS version, and location without opening the menu. Thanks @mvanhorn!</li>
-</ul>
-<p><a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md">View full changelog</a></p>
-]]></description>
-            <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.3.0/Nameplate-0.3.0.zip" length="3093080" type="application/octet-stream" sparkle:edSignature="uWnQCwgrrXC7v+MUXBE8Biy1PlKivkE1o3uCd87r6ecvUNw/FVog1Pow2PcD0fKav916wD19OcqaxVWcai/mCg=="/>
-        </item>
-        <item>
-            <title>0.2.5</title>
-            <pubDate>Thu, 09 Jul 2026 12:58:28 +0100</pubDate>
-            <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
-            <sparkle:version>8</sparkle:version>
-            <sparkle:shortVersionString>0.2.5</sparkle:shortVersionString>
-            <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-            <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
-            <description><![CDATA[<h2>Nameplate 0.2.5</h2>
-<ul>
-<li>Changed (Windows/Linux): new and unconfigured installs now default to square frame corners; macOS keeps its rounded bottom-corner default.</li>
-<li>Fixed: the DMG installer window no longer clips the bottom of the drag-to-install background (window height now accounts for the title bar).</li>
-</ul>
-<p><a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md">View full changelog</a></p>
-]]></description>
-            <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.2.5/Nameplate-0.2.5.zip" length="2989227" type="application/octet-stream" sparkle:edSignature="6ls67UE4ugJIypfWXJ4iDQ0zXLgw4O/FobR4jzRkSx96cbGdGROq4JN55UnReSJpHYQh+nFP6KsV59jeyk3uAQ=="/>
-        </item>
-    </channel>
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle" version="2.0">
+  <channel>
+    <item>
+      <title>0.5.0</title>
+      <pubDate>Fri, 16 Oct 2026 08:52:48 +0000</pubDate>
+      <sparkle:version>12</sparkle:version>
+      <sparkle:shortVersionString>0.5.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <description>&lt;pre&gt;**Highlights:** Anchor name tags at the center of any screen edge on macOS, Windows, and Linux, with precise offsets and improved macOS overlay visibility.
+
+- Name tags can anchor to the center of any screen edge on macOS, Windows, Linux, and the website demo, with signed offsets on centered axes, display-bounded placement, and numeric offset entry/reset in macOS settings and the demo. Thanks @Czaruno!
+- Fixed (macOS): floating overlay panels retain their requested window level, keeping name tags and splashes above regular windows. Thanks @Czaruno!
+- Maintenance: build and verify all release artifacts in GitHub Actions, with signed tags, notarization, Sparkle feed publication, checksums, and a Homebrew update handoff.
+- Maintenance: update four compatible Rust dependencies, Microsoft.NET.Test.Sdk to 18.11.0, and the pinned artifact download action to 8.0.2 while retaining Rust 1.92 and .NET 8 support.
+- Maintenance: update eight compatible Rust dependencies, the xUnit Visual Studio runner to 4.0.1 (fixing test-thread limiting while retaining .NET 8 support), and the pinned artifact upload action to 7.0.2.
+- Maintenance: update Sparkle to 2.10.0, Microsoft.NET.Test.Sdk to 18.10.1, compatible Rust dependencies, and pinned CI setup/artifact actions while preserving the supported runtime floors.
+&lt;/pre&gt;</description>
+      <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.5.0/Nameplate-0.5.0.zip" length="3006316" type="application/octet-stream" sparkle:edSignature="3mm37cVWvfkkLDaEd0gQDRRdwX+yVvBQx4BCTPNI0DE2H4qN/yIofU/4S6fYFxt7cEAFt3NOkkl6a1ZPjv1TDQ==" />
+    </item>
+    <title>Nameplate</title>
+    <item>
+      <title>0.4.0</title>
+      <pubDate>Sun, 13 Sep 2026 23:17:20 -0700</pubDate>
+      <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
+      <sparkle:version>11</sparkle:version>
+      <sparkle:shortVersionString>0.4.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <description>&lt;h2&gt;Nameplate 0.4.0&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;Highlights:&lt;/strong&gt; Move name tags inward from any corner with configurable horizontal and vertical offsets on macOS, Windows, and Linux.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Name-tag horizontal and vertical offsets can now move the tag inward from its selected corner on macOS, Windows, and Linux. Thanks @Czaruno!&lt;/li&gt;
+&lt;li&gt;Maintenance: update Sparkle, Linux dependencies, Windows test tooling, and GitHub Actions checkout.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md"&gt;View full changelog&lt;/a&gt;&lt;/p&gt;
+</description>
+      <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.4.0/Nameplate-0.4.0.zip" length="3124529" type="application/octet-stream" sparkle:edSignature="R3B0i6LCKhqsxJgivjp5V/LEV1EM0zUcqSGcUP6m0KMexV8OeetCIkbw4AmkhDN4savkR3bDgl0urSML50eOCw==" />
+    </item>
+    <item>
+      <title>0.3.1</title>
+      <pubDate>Thu, 16 Jul 2026 04:04:47 +0100</pubDate>
+      <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
+      <sparkle:version>10</sparkle:version>
+      <sparkle:shortVersionString>0.3.1</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description>&lt;h2&gt;Nameplate 0.3.1&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Overlay visibility changes now fade smoothly on macOS, Windows, and Linux, with reduced-motion settings respected.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md"&gt;View full changelog&lt;/a&gt;&lt;/p&gt;
+</description>
+      <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.3.1/Nameplate-0.3.1.zip" length="3099192" type="application/octet-stream" sparkle:edSignature="Uyjuc4k0mYpH8ln1pUR6RLUiFuwpMTkJL3VwjkcaiaABvOH3twO6gvFzfcl//QZEQqDaulPqgB66aWCAxnu1Cg==" />
+    </item>
+    <item>
+      <title>0.3.0</title>
+      <pubDate>Wed, 15 Jul 2026 13:50:47 +0100</pubDate>
+      <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
+      <sparkle:version>9</sparkle:version>
+      <sparkle:shortVersionString>0.3.0</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <description>&lt;h2&gt;Nameplate 0.3.0&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;macOS: attention alerts now dismiss on any mouse click without consuming it, so the intended control underneath still receives the click.&lt;/li&gt;
+&lt;li&gt;Website: the connect-splash demo now mirrors the native frame trace, glow, identity plate, exit timing, and Reduce Motion behavior; its attention demo also preserves the clicked control.&lt;/li&gt;
+&lt;li&gt;Windows/Linux: connect splashes now match the macOS frame trace, glow, identity-plate entrance, exit timing, and reduced-motion behavior; attention alerts dismiss on any mouse click without consuming it (X11 on Linux).&lt;/li&gt;
+&lt;li&gt;macOS: connect splash now traces the identity-colored screen perimeter, springs the nameplate into focus, dissolves smoothly, respects Reduce Motion, and plays when Nameplate launches.&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): remote-only overlays now use dedicated-port and process signals for best-effort TeamViewer and AnyDesk session detection. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;Linux: install Nameplate with &lt;code&gt;brew install steipete/tap/nameplate&lt;/code&gt; and keep it current with &lt;code&gt;brew upgrade&lt;/code&gt;. Thanks @officiallymarky!&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): imported config links now preserve watermark opacity values through the full Settings range instead of silently clamping them to 30%. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): &lt;code&gt;nameplate attention --color&lt;/code&gt; now rejects invalid values and normalizes valid hex colors before handing requests to the app. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): Settings window placement now persists across app restarts. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): rapid attention requests now queue and display in order instead of overwriting each other, while legacy handoffs still migrate. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): attention cards now stay visibly bounded and click-through until presentation succeeds, recover safely across display and Space changes, and can be cleared with &lt;code&gt;nameplate dismiss&lt;/code&gt; without quitting the app.&lt;/li&gt;
+&lt;li&gt;Fixed (macOS): Sparkle now stays disabled for Homebrew-managed installs even when the app lives directly in &lt;code&gt;/Applications&lt;/code&gt;. Thanks @abhinavgautam01!&lt;/li&gt;
+&lt;li&gt;macOS: &lt;code&gt;nameplate attention --wait&lt;/code&gt; now blocks until the human clicks, app-driven dismissal, request expiry, or wait timeout, with scriptable exit codes and FIFO behavior for concurrent alerts. Thanks @mvanhorn!&lt;/li&gt;
+&lt;li&gt;Optional name-tag info lines show the current IP address, uptime, macOS version, and location without opening the menu. Thanks @mvanhorn!&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md"&gt;View full changelog&lt;/a&gt;&lt;/p&gt;
+</description>
+      <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.3.0/Nameplate-0.3.0.zip" length="3093080" type="application/octet-stream" sparkle:edSignature="uWnQCwgrrXC7v+MUXBE8Biy1PlKivkE1o3uCd87r6ecvUNw/FVog1Pow2PcD0fKav916wD19OcqaxVWcai/mCg==" />
+    </item>
+    <item>
+      <title>0.2.5</title>
+      <pubDate>Thu, 09 Jul 2026 12:58:28 +0100</pubDate>
+      <link>https://raw.githubusercontent.com/steipete/Nameplate/main/appcast.xml</link>
+      <sparkle:version>8</sparkle:version>
+      <sparkle:shortVersionString>0.2.5</sparkle:shortVersionString>
+      <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
+      <sparkle:hardwareRequirements>arm64</sparkle:hardwareRequirements>
+      <description>&lt;h2&gt;Nameplate 0.2.5&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Changed (Windows/Linux): new and unconfigured installs now default to square frame corners; macOS keeps its rounded bottom-corner default.&lt;/li&gt;
+&lt;li&gt;Fixed: the DMG installer window no longer clips the bottom of the drag-to-install background (window height now accounts for the title bar).&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;a href="https://github.com/steipete/Nameplate/blob/main/CHANGELOG.md"&gt;View full changelog&lt;/a&gt;&lt;/p&gt;
+</description>
+      <enclosure url="https://github.com/steipete/Nameplate/releases/download/v0.2.5/Nameplate-0.2.5.zip" length="2989227" type="application/octet-stream" sparkle:edSignature="6ls67UE4ugJIypfWXJ4iDQ0zXLgw4O/FobR4jzRkSx96cbGdGROq4JN55UnReSJpHYQh+nFP6KsV59jeyk3uAQ==" />
+    </item>
+  </channel>
 </rss>
