@@ -78,7 +78,7 @@ macOS has no public remote-session connection event. Nameplate instead reacts to
 
 ## Development
 
-The macOS app requires Xcode 26 with Swift 6.2 or newer. From the repository root:
+The macOS app requires Xcode 26 with Swift 6.2 or newer. CI and release builds use the default Xcode 27 toolchain on GitHub's Apple silicon `xcode-27` runner while retaining the macOS 15 deployment target. From the repository root:
 
 ```sh
 swift build
