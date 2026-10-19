@@ -7,13 +7,13 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: macos-26
+    runs-on: xcode-27
+    env:
+      MACOSX_DEPLOYMENT_TARGET: '15.0'
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Release policy tests
         run: python3 -m unittest discover -s .github/scripts -p "test_*.py"
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode_26.0.app || sudo xcode-select -s "$(ls -d /Applications/Xcode*.app | sort -V | tail -1)"
       - name: Build
         run: swift build
       - name: Test

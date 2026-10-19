@@ -2,6 +2,8 @@
 
 ## 0.5.1 - Unreleased
 
+- Maintenance: move macOS CI and release builds to the Apple silicon `xcode-27` runner while preserving macOS 15 support.
+
 ## 0.5.0 - 2026-10-16
 
 **Highlights:** Anchor name tags at the center of any screen edge on macOS, Windows, and Linux, with precise offsets and improved macOS overlay visibility.
