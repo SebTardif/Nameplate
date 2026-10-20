@@ -2,6 +2,7 @@
 
 ## 0.5.1 - Unreleased
 
+- Maintenance: update the Linux libc dependency to 0.2.191 while retaining Rust 1.92 support.
 - Maintenance: move macOS CI and release builds to the Apple silicon `xcode-27` runner while preserving macOS 15 support.
 
 ## 0.5.0 - 2026-10-16
