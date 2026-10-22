@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
@@ -8,7 +9,7 @@ namespace Nameplate.App;
 
 internal sealed class PipeServer : IDisposable
 {
-    public const string PipeName = "nameplate";
+    public static readonly string PipeName = PipeNames.ForSession(Process.GetCurrentProcess().SessionId);
 
     private readonly Action<string> dispatch;
     private readonly CancellationTokenSource cancellation = new();
@@ -38,7 +39,7 @@ internal sealed class PipeServer : IDisposable
                     PipeDirection.In,
                     1,
                     PipeTransmissionMode.Byte,
-                    PipeOptions.Asynchronous);
+                    PipeOptions.Asynchronous | PipeOptions.CurrentUserOnly);
                 await pipe.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
                 using var reader = new StreamReader(
                     pipe,

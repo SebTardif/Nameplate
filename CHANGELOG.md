@@ -2,6 +2,7 @@
 
 ## 0.5.1 - Unreleased
 
+- Windows: a command pipe is private to the signed-in session, so a command from another session is not drawn on the first session.
 - Maintenance: update the Linux libc dependency to 0.2.191 while retaining Rust 1.92 support.
 - Maintenance: move macOS CI and release builds to the Apple silicon `xcode-27` runner while preserving macOS 15 support.
 
