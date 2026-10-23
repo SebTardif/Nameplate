@@ -84,7 +84,7 @@ public sealed class PipeTests
         Assert.Equal(0, Volatile.Read(ref dispatched));
     }
 
-    [InteractiveAdministratorFact]
+    [AdministratorFact]
     public async Task CliInAnotherSessionDeliversOnlyToThatSessionsPipe()
     {
         var dispatched = 0;
@@ -125,7 +125,9 @@ public sealed class PipeTests
         Directory.CreateDirectory(directory);
         var task = "NameplatePipeTest-" + Guid.NewGuid().ToString("N");
         var script = Path.Combine(directory, "probe.ps1");
+        var launcher = Path.Combine(directory, "launch.ps1");
         var result = Path.Combine(directory, "result.txt");
+        var registered = false;
         File.WriteAllText(script, $$"""
             $ErrorActionPreference = 'Stop'
             try {
@@ -138,18 +140,30 @@ public sealed class PipeTests
             """);
         try
         {
-            using var identity = WindowsIdentity.GetCurrent();
-            var arguments = new List<string> { "/Create", "/TN", task, "/SC", "ONCE", "/ST", "00:00", "/RU",
-                sameUser ? identity.Name : "SYSTEM", "/TR",
-                $"powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{script}\"", "/F" };
             if (sameUser)
             {
-                // S4U runs the same user noninteractively in session zero, without storing credentials.
-                arguments.Add("/NP");
+                var source = Path.Combine(AppContext.BaseDirectory, "SessionProcess.cs");
+                var currentSession = Process.GetCurrentProcess().SessionId;
+                var targetSession = currentSession == 0 ? checked((int)Nameplate.Proof.SessionProcess.ConsoleSessionId) : 0;
+                Assert.NotEqual(currentSession, targetSession);
+                var command = $"\"{Environment.GetFolderPath(Environment.SpecialFolder.System)}\\WindowsPowerShell\\v1.0\\powershell.exe\" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{script}\"";
+                File.WriteAllText(launcher, $$"""
+                    try {
+                        Add-Type -Path '{{source.Replace("'", "''")}}'
+                        [Nameplate.Proof.SessionProcess]::Run({{Environment.ProcessId}}, {{targetSession}}, '{{command.Replace("'", "''")}}')
+                    } catch {
+                        [System.IO.File]::WriteAllText('{{result.Replace("'", "''")}}.tmp', 'LAUNCH_FAILED:' + $_.Exception.GetBaseException().Message)
+                        [System.IO.File]::Move('{{result.Replace("'", "''")}}.tmp', '{{result.Replace("'", "''")}}')
+                    }
+                    """);
             }
+            var arguments = new List<string> { "/Create", "/TN", task, "/SC", "ONCE", "/ST", "00:00", "/RU",
+                "SYSTEM", "/TR",
+                $"powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File \"{(sameUser ? launcher : script)}\"", "/F" };
             await RunTaskScheduler(arguments.ToArray());
+            registered = true;
             await RunTaskScheduler("/Run", "/TN", task);
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(60));
             while (!File.Exists(result))
             {
                 await Task.Delay(100, timeout.Token);
@@ -159,7 +173,7 @@ public sealed class PipeTests
         }
         finally
         {
-            await RunTaskScheduler("/Delete", "/TN", task, "/F");
+            if (registered) await RunTaskScheduler("/Delete", "/TN", task, "/F");
             Directory.Delete(directory, recursive: true);
         }
     }
@@ -178,7 +192,7 @@ public sealed class PipeTests
         var error = process.StandardError.ReadToEndAsync();
         await process.WaitForExitAsync();
         await Task.WhenAll(output, error);
-        Assert.Equal(0, process.ExitCode);
+        Assert.True(process.ExitCode == 0, $"Task Scheduler exited {process.ExitCode}: {await error}");
     }
 }
 
@@ -187,21 +201,10 @@ public class AdministratorFactAttribute : FactAttribute
     public AdministratorFactAttribute()
     {
         using var identity = WindowsIdentity.GetCurrent();
-        if (!new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator))
-        {
-            Skip = "Requires an elevated Windows test host to create a temporary SYSTEM task.";
-        }
-    }
-}
-
-public sealed class InteractiveAdministratorFactAttribute : AdministratorFactAttribute
-{
-    public InteractiveAdministratorFactAttribute()
-    {
-        if (Process.GetCurrentProcess().SessionId == 0 &&
+        if (!new WindowsPrincipal(identity).IsInRole(WindowsBuiltInRole.Administrator) &&
             Environment.GetEnvironmentVariable("NAMEPLATE_REQUIRE_SESSION_PROOF") != "1")
         {
-            Skip = "Requires an interactive Windows session; CI runs this against a session-zero task.";
+            Skip = "Requires an elevated Windows test host to create a temporary SYSTEM task.";
         }
     }
 }

@@ -14,5 +14,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <ProjectReference Include="../Nameplate.App/Nameplate.App.csproj" />
+    <Content Include="SessionProcess.cs" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

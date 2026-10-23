@@ -15,7 +15,7 @@ dotnet publish Nameplate.App -c Release -r win-x64 --self-contained -p:PublishSi
 
 The single-file executable is written below `Nameplate.App/bin/Release/net8.0-windows/win-x64/publish/nameplate.exe`.
 
-The app tests exercise real Windows named pipes. Run them from an elevated interactive terminal to include the cross-account and cross-session checks, which create and remove temporary scheduled tasks without storing credentials. CI runs these checks on Windows.
+The app tests exercise real Windows named pipes. Run them from an elevated terminal to include the cross-account and cross-session checks, which create and remove temporary SYSTEM tasks without storing credentials. The session probe duplicates the test user's token into another existing Windows session. CI requires these checks on Windows.
 
 ## Install
 
